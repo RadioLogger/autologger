@@ -1,7 +1,7 @@
-name: Fix Backslash Paths
+name: Fix Backslash Paths v2
 
 on:
-  workflow_dispatch:  # Jalankan manual dari tab Actions
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -9,30 +9,30 @@ permissions:
 jobs:
   fix_paths:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Fix filenames with backslashes
+      - name: Normalize filenames with backslashes and quotes
         run: |
-          echo "🔧 Fixing file paths..."
-          # Cari file yang mengandung karakter backslash
-          git ls-files | grep '\\' || echo "No files with backslash found."
-          
-          # Proses semua file yang mengandung backslash
-          git ls-files | grep '\\' | while read f; do
-            newpath=$(echo "$f" | tr '\\' '/')
-            mkdir -p "$(dirname "$newpath")"
-            mv "$f" "$newpath"
+          echo "🔧 Scanning and fixing backslash paths..."
+          git ls-files | grep '\\\\' || echo "No files found with backslashes."
+
+          git ls-files | grep '\\\\' | while read raw; do
+            # Hapus tanda kutip dan escape dari nama file
+            clean=$(echo "$raw" | sed 's/^"//' | sed 's/"$//' | sed 's/\\\\/\\//g')
+            fixed=$(echo "$clean" | sed 's#\\#/#g')
+            echo "🧩 Fixing: $raw  →  $fixed"
+            mkdir -p "$(dirname "$fixed")" || true
+            mv "$clean" "$fixed" 2>/dev/null || mv "$raw" "$fixed" 2>/dev/null || echo "⚠️ Skip: $raw"
           done
-          
-          echo "✅ Path normalization complete."
+
+          echo "✅ Path normalization finished."
 
       - name: Commit and push renamed files
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Fix backslash filenames to proper folder structure"
+          commit_message: "Fix backslash filenames (normalize escaped Windows paths)"
           branch: master
