@@ -1,0 +1,60 @@
+name: Auto Unzip + Fix Paths + Move + Clean
+
+on:
+  push:
+    paths:
+      - "AutoLogger_OpenCollaboration_Template.zip"
+
+permissions:
+  contents: write
+
+jobs:
+  unzip_move_clean:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install 7zip (fix for Windows ZIP paths)
+        run: sudo apt-get update && sudo apt-get install -y p7zip-full
+
+      - name: Prepare temporary folder
+        run: mkdir -p tmp_unzip
+
+      - name: 🧩 Extract ZIP with 7z
+        run: |
+          echo "🧩 Extracting ZIP..."
+          7z x AutoLogger_OpenCollaboration_Template.zip -o"./tmp_unzip"
+
+      - name: 🔧 Fix Windows-style backslash paths
+        run: |
+          echo "🔧 Normalizing paths (\\ to /)..."
+          cd tmp_unzip
+          find . -type f | while read f; do
+            if [[ "$f" == *"\\"* ]]; then
+              newpath=$(echo "$f" | tr '\\' '/')
+              mkdir -p "$(dirname "$newpath")"
+              mv "$f" "$newpath"
+            fi
+          done
+          cd ..
+
+      - name: 🚚 Move extracted content to repository root
+        run: |
+          echo "🚚 Moving extracted files to root..."
+          shopt -s dotglob
+          mv tmp_unzip/* ./
+          rm -rf tmp_unzip
+          echo "✅ Files successfully moved to root."
+
+      - name: 🧹 Clean up original ZIP
+        run: rm -f AutoLogger_OpenCollaboration_Template.zip
+
+      - name: ✅ Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Auto unzip, fix Windows paths, move to root, and clean ZIP"
+          branch: master
