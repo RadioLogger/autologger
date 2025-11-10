@@ -1,0 +1,54 @@
+name: Fix Backslash Paths + Auto-Flatten
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix_and_flatten:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fix Windows-style backslashes safely
+        run: |
+          echo "🔧 Scanning and fixing backslash paths..."
+          git ls-files | grep '\\\\' || echo "No files with backslashes found."
+
+          git ls-files | grep '\\\\' | while read raw; do
+            clean=$(echo "$raw" | tr -d '"')
+            fixed=$(echo "$clean" | awk '{gsub(/\\/, "/"); print}')
+            echo "🧩 Fixing: $clean → $fixed"
+            mkdir -p "$(dirname "$fixed")" || true
+            if [ -f "$clean" ]; then
+              mv "$clean" "$fixed"
+            elif [ -f "$raw" ]; then
+              mv "$raw" "$fixed"
+            else
+              echo "⚠️ File not found: $clean"
+            fi
+          done
+          echo "✅ Backslash normalization done."
+
+      - name: 🔁 Auto-flatten AutoLogger folder to root
+        run: |
+          echo "🚚 Moving all contents from AutoLogger/ to root..."
+          if [ -d "AutoLogger" ]; then
+            shopt -s dotglob
+            mv AutoLogger/* ./
+            rm -rf AutoLogger
+            echo "✅ AutoLogger folder flattened."
+          else
+            echo "ℹ️ No AutoLogger folder found, skipping flatten step."
+          fi
+
+      - name: Commit and push all fixes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Normalize paths and flatten AutoLogger/ contents to root"
+          branch: master
