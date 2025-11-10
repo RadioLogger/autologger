@@ -1,4 +1,4 @@
-name: Fix Backslash Paths v2
+name: Fix Backslash Paths v3
 
 on:
   workflow_dispatch:
@@ -15,24 +15,35 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Normalize filenames with backslashes and quotes
+      - name: Fix Windows-style backslashes safely
         run: |
           echo "🔧 Scanning and fixing backslash paths..."
-          git ls-files | grep '\\\\' || echo "No files found with backslashes."
-
+          # Cari semua file yang punya backslash di nama
+          git ls-files | grep '\\\\' || echo "No files with backslashes found."
+          
           git ls-files | grep '\\\\' | while read raw; do
-            # Hapus tanda kutip dan escape dari nama file
-            clean=$(echo "$raw" | sed 's/^"//' | sed 's/"$//' | sed 's/\\\\/\\//g')
-            fixed=$(echo "$clean" | sed 's#\\#/#g')
-            echo "🧩 Fixing: $raw  →  $fixed"
+            # Hapus tanda kutip di awal/akhir
+            clean=$(echo "$raw" | tr -d '"')
+            # Ganti backslash (\) menjadi slash (/)
+            fixed=$(echo "$clean" | awk '{gsub(/\\/, "/"); print}')
+            
+            echo "🧩 Fixing: $clean  →  $fixed"
+            
             mkdir -p "$(dirname "$fixed")" || true
-            mv "$clean" "$fixed" 2>/dev/null || mv "$raw" "$fixed" 2>/dev/null || echo "⚠️ Skip: $raw"
+            # Coba pindahkan file jika ada
+            if [ -f "$clean" ]; then
+              mv "$clean" "$fixed"
+            elif [ -f "$raw" ]; then
+              mv "$raw" "$fixed"
+            else
+              echo "⚠️ File not found: $clean"
+            fi
           done
 
-          echo "✅ Path normalization finished."
+          echo "✅ All paths normalized successfully."
 
       - name: Commit and push renamed files
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Fix backslash filenames (normalize escaped Windows paths)"
+          commit_message: "Normalize Windows backslash filenames to Unix-style folders"
           branch: master
