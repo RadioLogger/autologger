@@ -7,7 +7,7 @@
 
 AutoLogger is a decentralized, educational open collaboration project integrating IoT, IPFS, and blockchain.
 
-⚠️ Disclaimer
+⚠️ Disclaimer(https://github.com/RadioLogger/autologger/blob/master/DISCLAIMER.md#1-project-overview)
 
 AutoLogger Ecosystem is a non-commercial, open, and educational project dedicated to supporting the development and research of amateur radio, IoT, and blockchain technologies.
 
@@ -23,3 +23,4 @@ Promoting collaboration between operators, educators, and developers
 Every contribution is voluntary, transparent, and non-profit.
 There are no registration fees, sales, or financial transactions that violate amateur radio regulations.
 Any tokens or points are symbolic rewards designed to motivate participation and strengthen the global amateur radio ecosystem through digital collaboration.
+
