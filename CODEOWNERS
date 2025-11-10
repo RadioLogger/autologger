@@ -1,11 +1,11 @@
-*                         @tutwidi
-/firmware/                @tutwidi @firmware-dev-team
-/backend/                 @tutwidi @backend-dev-team
-/web/                     @tutwidi @web-dev-team
-/ipfs/                    @tutwidi @ipfs-engineers
-/data/                    @tutwidi @data-engineers
-/validator/               @tutwidi @validator-team
-/ai/                      @tutwidi @ai-team
-/docs/                    @tutwidi @doc-writers
-/governance/              @tutwidi @dao-architects
-/community/               @tutwidi @community-managers
+*              @tutwidi
+/firmware/     @tutwidi @RadioLogger/firmware-dev-team
+/backend/      @tutwidi @RadioLogger/backend-dev-team
+/web/          @tutwidi @RadioLogger/web-dev-team
+/ipfs/         @tutwidi @RadioLogger/ipfs-engineers
+/data/         @tutwidi @RadioLogger/data-engineers
+/validator/    @tutwidi @RadioLogger/validator-team
+/ai/           @tutwidi @RadioLogger/ai-team
+/docs/         @tutwidi @RadioLogger/doc-writers
+/governance/   @tutwidi @RadioLogger/dao-architects
+/community/    @tutwidi @RadioLogger/community-managers
