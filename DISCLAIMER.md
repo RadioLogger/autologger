@@ -157,7 +157,6 @@ All contributors must act transparently and uphold these values for the benefit 
 - **Website:** *(to be updated)*  
 - **Repository:** [https://github.com/RadioLogger](https://github.com/RadioLogger)  
 - **Public Docs (IPFS):** [ipfs.io/ipfs/](https://ipfs.io/ipfs/) *(to be updated)*  
-- **Community Email:** widiastawan@gmail.com
 - **License:** MIT — Open for educational and non‑commercial use.
 
 ---
