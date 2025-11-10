@@ -1,0 +1,38 @@
+name: Fix Backslash Paths
+
+on:
+  workflow_dispatch:  # Jalankan manual dari tab Actions
+
+permissions:
+  contents: write
+
+jobs:
+  fix_paths:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fix filenames with backslashes
+        run: |
+          echo "🔧 Fixing file paths..."
+          # Cari file yang mengandung karakter backslash
+          git ls-files | grep '\\' || echo "No files with backslash found."
+          
+          # Proses semua file yang mengandung backslash
+          git ls-files | grep '\\' | while read f; do
+            newpath=$(echo "$f" | tr '\\' '/')
+            mkdir -p "$(dirname "$newpath")"
+            mv "$f" "$newpath"
+          done
+          
+          echo "✅ Path normalization complete."
+
+      - name: Commit and push renamed files
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Fix backslash filenames to proper folder structure"
+          branch: master
