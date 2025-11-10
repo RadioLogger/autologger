@@ -1,0 +1,12 @@
+node_modules/
+dist/
+build/
+.env
+.env.*
+.ipfs/
+repo.lock
+*.bin
+*.elf
+*.log
+.pio/
+.arduino-build/
